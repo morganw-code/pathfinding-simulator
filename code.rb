@@ -32,7 +32,7 @@ def redraw()
 end
 
 def draw_screen()
-    width = 50
+    width = 30
     border_width = 1
     height = 10
 
@@ -74,23 +74,43 @@ def draw_screen()
     dx = $put_at[:a][:x] - $put_at[:b][:x]
     dy = $put_at[:a][:y] - $put_at[:b][:y]
 
-    distance = Math.sqrt(dx * dx + dy * dy).round(2)
+    distance = Math.sqrt(dx * dx + dy * dy)
     print("A distance from B: #{distance}\n")
 
-    # surrounding nodes from A
+
     a_north = $put_at[:a][:y] - 1
+    a_south = $put_at[:a][:y] + 1
+    a_east = $put_at[:a][:x] + 1
+    a_west = $put_at[:a][:x] - 1
+
+    # surrounding nodes from A
+    a_north_x = $put_at[:a][:x]
+    a_north_y = $put_at[:a][:y] - 1
+    a_north_pair = [a_north_x, a_north_y]
     a_north_east = [$put_at[:a][:y] - 1, $put_at[:a][:x] + 1]
 
-    a_east = $put_at[:a][:x] + 1
     a_south_east = [$put_at[:a][:y] + 1, $put_at[:a][:x] + 1]
 
-    a_south = $put_at[:a][:y] + 1
+    a_south_x = $put_at[:a][:x]
+    a_south_y = $put_at[:a][:y] + 1
+    a_south_pair = [a_south_x, a_south_y]
     a_south_west = [$put_at[:a][:y] + 1, $put_at[:a][:x] - 1]
 
-    a_west = $put_at[:a][:x] - 1
     a_north_west = [$put_at[:a][:y] - 1, $put_at[:a][:x] - 1]
 
-    sleep(0.5)
+    # surrounding node calculations
+    a_north_node_x = $put_at[:a][:x] - a_north_pair[0]
+    a_north_node_y = $put_at[:a][:y] - a_north_pair[1]
+    a_north_g_cost = Math.sqrt(a_north_node_x * a_north_node_x + a_north_node_y * a_north_node_y)
+
+    a_south_node_x = $put_at[:a][:x] - a_south_pair[0]
+    a_south_node_y = $put_at[:a][:y] - a_south_pair[1]
+    a_south_g_cost = Math.sqrt(a_south_node_x * a_south_node_x + a_south_node_y * a_south_node_y)
+
+    print("a_north_g_cost: #{a_north_g_cost}\n")
+    print("a_south_g_cost: #{a_south_g_cost}\n")
+
+    sleep(1)
     if($put_at[:a][:x] == $put_at[:b][:x])
         animate($put_at[:a][:x], a_south)
     else
@@ -98,13 +118,10 @@ def draw_screen()
     end
 end
 
-def animate(x = 0, y = 2)
-    p x
-    5.times {
-        $put_at[:a][:x] = x
-        $put_at[:a][:y] = y
-        redraw()
-    }
+def animate(x = 0, y = 0)
+    $put_at[:a][:x] = x
+    $put_at[:a][:y] = y
+    redraw()
 end
 
 draw_screen()
