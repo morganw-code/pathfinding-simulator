@@ -37,16 +37,25 @@ def draw_screen()
     while(y < height)
         x = 0
 
-        # first and last 1 dimensional frame in the frame_stack_buffer should only ever
+        # check if inside border
         if(y > 0 && y < height - 1)
             while(x < width && $printer_active_buffer.count() < width)
-                $printer_active_buffer.push("N")
-                x + border_width == put_at[:a][:x] ? $printer_active_buffer.push("X".colorize(:blue)) : false
+                # if x is supposed to be a border
+                if(x == 0 || x == width - 1)
+                    $printer_active_buffer.push("N".colorize(:red))
+                # if x pos is item
+                elsif(x + border_width == put_at[:a][:x])
+                    $printer_active_buffer.push("X".colorize(:blue))
+                # else x is empty space
+                else
+                    $printer_active_buffer.push("0")
+                end
                 x += 1
             end
         else
+            # print first and last frame 'borders'
             width.times {
-                $printer_active_buffer.push("N")
+                $printer_active_buffer.push("N".colorize(:red))
             }
         end
 
