@@ -13,6 +13,8 @@ require 'colorize'
 # printer_active_buffer is pushed to printer_cache_buffer and then wiped each line
 $printer_cache_buffer = []
 $printer_active_buffer = []
+# positions are relative to the entire width / height
+$put_at = { :a => {:x => 2, :y => 2}, :b => { :x => 19, :y => 9 }}
 
 def printer(print_buffer)
     print("#{print_buffer.join()}\n")
@@ -24,13 +26,15 @@ def clear_cache_buffer()
     $printer_cache_buffer.clear()
 end
 
+def redraw()
+    system('clear')
+    draw_screen()
+end
+
 def draw_screen()
-    width = 20
+    width = 50
     border_width = 1
     height = 10
-
-    # positions are relative to the entire width / height
-    put_at = { :a => {:x => 5, :y => 5} }
 
     x = 0
     y = 0
@@ -46,8 +50,11 @@ def draw_screen()
             elsif((y == 0 || y == height - border_width) && border_width > 0)
                 $printer_active_buffer.push("N".colorize(:red))
             # if x is item and in correct y position
-            elsif(x + border_width == put_at[:a][:x] && y + border_width == put_at[:a][:y])
+            elsif(x + border_width == $put_at[:a][:x] && y + border_width == $put_at[:a][:y])
                 $printer_active_buffer.push("X".colorize(:blue))
+            # if x is item and in correct y position
+            elsif(x + border_width == $put_at[:b][:x] && y + border_width == $put_at[:b][:y])
+                $printer_active_buffer.push("X".colorize(:green))
             # else x is empty space
             else
                 $printer_active_buffer.push("0")
@@ -60,6 +67,44 @@ def draw_screen()
 
     print("drawable_width: #{(width - border_width * 2)}\n")
     print("drawable_height: #{(height - border_width * 2)}\n")
+    print("A: x_pos: #{$put_at[:a][:x]} y_pos: #{$put_at[:a][:y]}\n")
+    print("B: x_pos: #{$put_at[:b][:x]} y_pos: #{$put_at[:b][:y]}\n")
+
+    # calculate distance
+    dx = $put_at[:a][:x] - $put_at[:b][:x]
+    dy = $put_at[:a][:y] - $put_at[:b][:y]
+
+    distance = Math.sqrt(dx * dx + dy * dy).round(2)
+    print("A distance from B: #{distance}\n")
+
+    # surrounding nodes from A
+    a_north = $put_at[:a][:y] - 1
+    a_north_east = [$put_at[:a][:y] - 1, $put_at[:a][:x] + 1]
+
+    a_east = $put_at[:a][:x] + 1
+    a_south_east = [$put_at[:a][:y] + 1, $put_at[:a][:x] + 1]
+
+    a_south = $put_at[:a][:y] + 1
+    a_south_west = [$put_at[:a][:y] + 1, $put_at[:a][:x] - 1]
+
+    a_west = $put_at[:a][:x] - 1
+    a_north_west = [$put_at[:a][:y] - 1, $put_at[:a][:x] - 1]
+
+    sleep(0.5)
+    if($put_at[:a][:x] == $put_at[:b][:x])
+        animate($put_at[:a][:x], a_south)
+    else
+        animate(a_east, 2)
+    end
+end
+
+def animate(x = 0, y = 2)
+    p x
+    5.times {
+        $put_at[:a][:x] = x
+        $put_at[:a][:y] = y
+        redraw()
+    }
 end
 
 draw_screen()
