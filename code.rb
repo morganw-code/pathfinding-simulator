@@ -29,6 +29,7 @@ def draw_screen()
     border_width = 1
     height = 10
 
+    # positions are relative to the entire width / height
     put_at = { :a => {:x => 5, :y => 5} }
 
     x = 0
@@ -37,27 +38,22 @@ def draw_screen()
     while(y < height)
         x = 0
         # check if inside border
-        if(y > 0 && y < height - 1)
-            while(x < width && $printer_active_buffer.count() < width)
-                # if x is supposed to be a border
-                if(x == 0 || x == width - 1)
-                    $printer_active_buffer.push("N".colorize(:red))
-                # if x is item and in correct y position
-                elsif(x + border_width == put_at[:a][:x] && y + border_width == put_at[:a][:y])
-                    $printer_active_buffer.push("X".colorize(:blue))
-                # else x is empty space
-                else
-                    $printer_active_buffer.push("0")
-                end
-                x += 1
-            end
-        else
-            # print first and last frame 'borders'
-            width.times {
+        while(x < width && $printer_active_buffer.count() < width)
+            # if x is supposed to be a border left and right side
+            if((x == 0 || x == width - border_width) && border_width > 0)
                 $printer_active_buffer.push("N".colorize(:red))
-            }
+            # if y is supposed to be a border top and bottom side
+            elsif((y == 0 || y == height - border_width) && border_width > 0)
+                $printer_active_buffer.push("N".colorize(:red))
+            # if x is item and in correct y position
+            elsif(x + border_width == put_at[:a][:x] && y + border_width == put_at[:a][:y])
+                $printer_active_buffer.push("X".colorize(:blue))
+            # else x is empty space
+            else
+                $printer_active_buffer.push("0")
+            end
+            x += 1
         end
-
         printer($printer_active_buffer)
         y += 1
     end
