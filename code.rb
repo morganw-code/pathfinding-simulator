@@ -1,5 +1,11 @@
 =begin
     My goal is to eventually create a mini simple terminal engine for running path finding simulations visually
+
+    tests:
+    - items should never draw over borders
+
+    TODO:
+    - collision detection
 =end
 
 require 'colorize'
@@ -23,20 +29,13 @@ def draw_screen()
     border_width = 1
     height = 10
 
-    # NNNN
-    # NX  
-    # N
-
-    # define a pos
-    # printer should calc where n is inside the arr
-    put_at = { :a => {:x => 5, :y => 1} }
+    put_at = { :a => {:x => 10, :y => 1} }
 
     x = 0
     y = 0
 
     while(y < height)
         x = 0
-
         # check if inside border
         if(y > 0 && y < height - 1)
             while(x < width && $printer_active_buffer.count() < width)
@@ -62,6 +61,9 @@ def draw_screen()
         printer($printer_active_buffer)
         y += 1
     end
+
+    print("drawable_width: #{(width - border_width * 2)}\n")
+    print("drawable_height: #{(height - border_width * 2)}\n")
 end
 
 draw_screen()
