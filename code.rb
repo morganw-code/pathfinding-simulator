@@ -29,7 +29,7 @@ def draw_screen()
     border_width = 1
     height = 10
 
-    put_at = { :a => {:x => 10, :y => 1} }
+    put_at = { :a => {:x => 5, :y => 5} }
 
     x = 0
     y = 0
@@ -42,8 +42,8 @@ def draw_screen()
                 # if x is supposed to be a border
                 if(x == 0 || x == width - 1)
                     $printer_active_buffer.push("N".colorize(:red))
-                # if x pos is item
-                elsif(x + border_width == put_at[:a][:x])
+                # if x is item and in correct y position
+                elsif(x + border_width == put_at[:a][:x] && y + border_width == put_at[:a][:y])
                     $printer_active_buffer.push("X".colorize(:blue))
                 # else x is empty space
                 else
