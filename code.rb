@@ -47,10 +47,10 @@ def clear_cache_buffer()
 end
 
 def redraw()
-    system('clear')
+    system('clear') || system('cls')
     draw_screen()
 end
-
+#
 def draw_screen()
     width = 30
     border_width = 1
@@ -193,9 +193,8 @@ def draw_screen()
     # if A pos != B pos
     if(!($put_at[:a][:x] == $put_at[:b][:x] && $put_at[:a][:y] == $put_at[:b][:y]))
         # collision detection
-        # if A surrounding nodes != wall pos
+        # if A surrounding node == wall pos
         if(a_north_y == $put_at[:wall][:y] && a_north_x == $put_at[:wall][:x])
-            print("Cant go up!\n".colorize(:red))
             f_cost.delete(:north)
         elsif(a_south_y == $put_at[:wall][:y] && a_north_x == $put_at[:wall][:x])
             f_cost.delete(:south)
