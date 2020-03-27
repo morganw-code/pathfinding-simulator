@@ -1,5 +1,23 @@
 =begin
-    My goal is to eventually create a mini simple terminal engine for running path finding simulations visually
+    Pathfinding Simulator is a terminal-based pathfinding simulator.
+    Copyright (C) 2020 Morgan Webb
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>
+=end
+
+=begin
+    My goal is to eventually create a mini simple terminal engine for running pathfinding simulations visually
 
     tests:
     - items should never draw over borders
@@ -14,7 +32,7 @@ require 'colorize'
 $printer_cache_buffer = []
 $printer_active_buffer = []
 # positions are relative to the entire width / height
-$put_at = { :a => {:x => 2, :y => 2}, :b => { :x => 19, :y => 9 }}
+$put_at = { :a => {:x => 2, :y => 2}, :b => { :x => 10, :y => 9 }}
 
 def printer(print_buffer)
     print("#{print_buffer.join()}\n")
@@ -77,7 +95,7 @@ def draw_screen()
     distance = Math.sqrt(dx * dx + dy * dy)
     print("A distance from B: #{distance}\n")
 
-
+    # directions
     a_north = $put_at[:a][:y] - 1
     a_south = $put_at[:a][:y] + 1
     a_east = $put_at[:a][:x] + 1
@@ -98,7 +116,16 @@ def draw_screen()
 
     a_north_west = [$put_at[:a][:y] - 1, $put_at[:a][:x] - 1]
 
-    # surrounding node calculations
+    a_east_x = $put_at[:a][:x] + 1
+    a_east_y = $put_at[:a][:y]
+    a_east_pair = [a_east_x, a_east_y]
+
+    a_west_x = $put_at[:a][:x] - 1
+    a_west_y = $put_at[:a][:y]
+    a_west_pair = [a_west_x, a_west_y]
+
+    # surrounding node calculations g cost (distance from starting node)
+
     a_north_node_x = $put_at[:a][:x] - a_north_pair[0]
     a_north_node_y = $put_at[:a][:y] - a_north_pair[1]
     a_north_g_cost = Math.sqrt(a_north_node_x * a_north_node_x + a_north_node_y * a_north_node_y)
@@ -107,10 +134,57 @@ def draw_screen()
     a_south_node_y = $put_at[:a][:y] - a_south_pair[1]
     a_south_g_cost = Math.sqrt(a_south_node_x * a_south_node_x + a_south_node_y * a_south_node_y)
 
+    a_east_node_x = $put_at[:a][:x] - a_east_pair[0]
+    a_east_node_y = $put_at[:a][:y] - a_east_pair[1]
+    a_east_g_cost = Math.sqrt(a_east_node_x * a_east_node_x + a_east_node_y * a_east_node_y)
+
+    a_west_node_x = $put_at[:a][:x] - a_west_pair[0]
+    a_west_node_y = $put_at[:a][:y] - a_west_pair[1]
+    a_west_g_cost = Math.sqrt(a_west_node_x * a_west_node_x + a_west_node_y * a_west_node_y)
+
+    # surrounding node calculations h cost (distance from end node)
+
+    a_north_node_x = $put_at[:b][:x] - a_north_pair[0]
+    a_north_node_y = $put_at[:b][:y] - a_north_pair[1]
+    a_north_h_cost = Math.sqrt(a_north_node_x * a_north_node_x + a_north_node_y * a_north_node_y)
+
+    a_south_node_x = $put_at[:b][:x] - a_south_pair[0]
+    a_south_node_y = $put_at[:b][:y] - a_south_pair[1]
+    a_south_h_cost = Math.sqrt(a_south_node_x * a_south_node_x + a_south_node_y * a_south_node_y)
+
+    a_east_node_x = $put_at[:b][:x] - a_east_pair[0]
+    a_east_node_y = $put_at[:b][:y] - a_east_pair[1]
+    a_east_h_cost = Math.sqrt(a_east_node_x * a_east_node_x + a_east_node_y * a_east_node_y)
+
+    a_west_node_x = $put_at[:b][:x] - a_west_pair[0]
+    a_west_node_y = $put_at[:b][:y] - a_west_pair[1]
+    a_west_h_cost = Math.sqrt(a_west_node_x * a_west_node_x + a_west_node_y * a_west_node_y)
+
+    # surrounding node calculations f cost - lowest preferred (g cost + h cost)
+
+    a_north_f_cost = a_north_g_cost + a_north_h_cost
+    a_south_f_cost = a_south_g_cost + a_south_h_cost
+    a_east_f_cost = a_east_g_cost + a_east_h_cost
+    a_west_f_cost = a_west_g_cost + a_west_h_cost
+
     print("a_north_g_cost: #{a_north_g_cost}\n")
     print("a_south_g_cost: #{a_south_g_cost}\n")
+    print("a_east_g_cost: #{a_east_g_cost}\n")
+    print("a_west_g_cost: #{a_west_g_cost}\n")
 
-    sleep(1)
+    print("a_north_h_cost: #{a_north_h_cost}\n")
+    print("a_south_h_cost: #{a_south_h_cost}\n")
+    print("a_east_h_cost: #{a_east_h_cost}\n")
+    print("a_west_h_cost: #{a_west_h_cost}\n")
+
+    print("a_north_f_cost: #{a_north_f_cost}\n")
+    print("a_south_f_cost: #{a_south_f_cost}\n")
+    print("a_east_f_cost: #{a_east_f_cost}\n")
+    print("a_west_f_cost: #{a_west_f_cost}\n")
+
+    sleep(0.5)
+
+    # temp anim for visualization during development
     if($put_at[:a][:x] == $put_at[:b][:x])
         animate($put_at[:a][:x], a_south)
     else
