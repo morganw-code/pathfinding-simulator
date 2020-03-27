@@ -32,7 +32,9 @@ require 'colorize'
 $printer_cache_buffer = []
 $printer_active_buffer = []
 # positions are relative to the entire width / height
-$put_at = { :a => {:x => 2, :y => 2}, :b => { :x => 10, :y => 9 }}
+$put_at = { :a => {:x => 2, :y => 2},
+            :b => { :x => 2, :y => 9 },
+            :wall => { :x => 2, :y => 7 }}
 
 def printer(print_buffer)
     print("#{print_buffer.join()}\n")
@@ -73,6 +75,8 @@ def draw_screen()
             # if x is item and in correct y position
             elsif(x + border_width == $put_at[:b][:x] && y + border_width == $put_at[:b][:y])
                 $printer_active_buffer.push("X".colorize(:green))
+            elsif(x + border_width == $put_at[:wall][:x] && y + border_width == $put_at[:wall][:y])
+                $printer_active_buffer.push("N".colorize(:red))
             # else x is empty space
             else
                 $printer_active_buffer.push("0")
@@ -182,17 +186,37 @@ def draw_screen()
     print("a_east_f_cost: #{a_east_f_cost}\n")
     print("a_west_f_cost: #{a_west_f_cost}\n")
 
-    fcost = { :north => a_north_f_cost, :south => a_south_f_cost, :east => a_east_f_cost, :west => a_west_f_cost }
+    f_cost = { :north => a_north_f_cost, :south => a_south_f_cost, :east => a_east_f_cost, :west => a_west_f_cost }
 
     sleep(0.5)
-    calculate_move(fcost)
+
+    # if A pos != B pos
+    if(!($put_at[:a][:x] == $put_at[:b][:x] && $put_at[:a][:y] == $put_at[:b][:y]))
+        # collision detection
+        # if A surrounding nodes != wall pos
+        if(a_north_y == $put_at[:wall][:y] && a_north_x == $put_at[:wall][:x])
+            print("Cant go up!\n".colorize(:red))
+            f_cost.delete(:north)
+        elsif(a_south_y == $put_at[:wall][:y] && a_north_x == $put_at[:wall][:x])
+            f_cost.delete(:south)
+        elsif(a_east_x == $put_at[:wall][:x] && a_north_x == $put_at[:wall][:y])
+            f_cost.delete(:east)
+        elsif(a_west_x == $put_at[:wall][:x] && a_north_x == $put_at[:wall][:y])
+            f_cost.delete(:west)
+        end
+
+        calculate_move(f_cost)
+    else
+        system('clear')
+        print("Woo!\n".colorize(:green))
+    end
 end
 
-def calculate_move(fcost)
+def calculate_move(f_cost)
     # only going to worry about f cost atm
 
     # takes min f_cost from hash and navs accordingly
-    direction = fcost.min_by { |k, v| v }[0] # first val
+    direction = f_cost.min_by { |k, v| v }[0] # first val
 
     case(direction)
     when :north
