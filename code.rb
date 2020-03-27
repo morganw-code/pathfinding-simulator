@@ -182,19 +182,37 @@ def draw_screen()
     print("a_east_f_cost: #{a_east_f_cost}\n")
     print("a_west_f_cost: #{a_west_f_cost}\n")
 
-    sleep(0.5)
+    fcost = { :north => a_north_f_cost, :south => a_south_f_cost, :east => a_east_f_cost, :west => a_west_f_cost }
 
-    # temp anim for visualization during development
-    if($put_at[:a][:x] == $put_at[:b][:x])
-        animate($put_at[:a][:x], a_south)
+    sleep(0.5)
+    calculate_move(fcost)
+end
+
+def calculate_move(fcost)
+    # only going to worry about f cost atm
+
+    # takes min f_cost from hash and navs accordingly
+    direction = fcost.min_by { |k, v| v }[0] # first val
+
+    case(direction)
+    when :north
+        $put_at[:a][:y] -= 1
+    when :south
+        $put_at[:a][:y] += 1
+    when :east
+        $put_at[:a][:x] += 1
+    when :west
+        $put_at[:a][:x] -= 1
     else
-        animate(a_east, 2)
+        print("help, something is wrong!\n")
     end
+
+    redraw()
 end
 
 def animate(x = 0, y = 0)
-    $put_at[:a][:x] = x
-    $put_at[:a][:y] = y
+    #$put_at[:a][:x] = x
+    #$put_at[:a][:y] = y
     redraw()
 end
 
