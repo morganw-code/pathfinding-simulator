@@ -2,7 +2,7 @@ require_relative './printer.rb'
 
 class Simulator
 
-    attr_accessor :width, :height, :border_thickness, :drawable_width, :drawable_height, :node_list, :stats, :put_at, :traversed, :current_position, :last_position, :conflicting_values, :n_pos, :s_pos, :e_pos, :w_pos, :current_node_key, :printer
+    attr_accessor :width, :height, :border_thickness, :drawable_width, :drawable_height, :node_list, :stats, :put_at, :traversed, :current_position, :last_position, :conflicting_values, :n_pos, :s_pos, :e_pos, :w_pos, :nw_pos, :ne_pos, :sw_pos, :se_pos, :current_node_key, :printer
 
     def initialize(width, height, border_thickness)
         @width = width
@@ -23,6 +23,10 @@ class Simulator
         @s_pos = nil
         @e_pos = nil
         @w_pos = nil
+        @nw_pos = nil
+        @ne_pos = nil
+        @sw_pos = nil
+        @se_pos = nil
         @printer = Printer.new(@width, @height, @border_thickness, self)
 
     end
@@ -36,7 +40,7 @@ class Simulator
             #sleep(3)
             calculate_a_star()
             @printer.print_stats()
-            sleep(0.5)
+            sleep(0.1)
         end
     end
 
@@ -58,16 +62,10 @@ class Simulator
         north_x = @put_at[:a][:x]
         north_y = @put_at[:a][:y] - 1
         north_pair = [north_x, north_y]
-        north_east = [@put_at[:a][:y] - 1, @put_at[:a][:x] + 1]
-
-        south_east = [@put_at[:a][:y] + 1, @put_at[:a][:x] + 1]
 
         south_x = @put_at[:a][:x]
         south_y = @put_at[:a][:y] + 1
         south_pair = [south_x, south_y]
-        south_west = [@put_at[:a][:y] + 1, @put_at[:a][:x] - 1]
-
-        north_west = [@put_at[:a][:y] - 1, @put_at[:a][:x] - 1]
 
         east_x = @put_at[:a][:x] + 1
         east_y = @put_at[:a][:y]
@@ -81,6 +79,16 @@ class Simulator
         @s_pos = query_symbol(south_x, south_y)
         @e_pos = query_symbol(east_x, east_y)
         @w_pos = query_symbol(west_x, west_y)
+
+        north_west = [@put_at[:a][:x] - 1, @put_at[:a][:y] - 1]
+        north_east = [@put_at[:a][:x] + 1, @put_at[:a][:y] - 1]
+        south_west = [@put_at[:a][:x] - 1, @put_at[:a][:y] + 1]
+        south_east = [@put_at[:a][:x] + 1, @put_at[:a][:y] + 1]
+
+        @nw_pos = query_symbol(north_west[0], north_west[1])
+        @ne_pos = query_symbol(north_east[0], north_east[1])
+        @sw_pos = query_symbol(south_west[0], south_west[1])
+        @se_pos = query_symbol(south_east[0], south_east[1])
         # surrounding node calculations g cost (distance from starting node)
 
         north_node_x = @put_at[:a][:x] - north_pair[0]
@@ -98,6 +106,23 @@ class Simulator
         west_node_x = @put_at[:a][:x] - west_pair[0]
         west_node_y = @put_at[:a][:y] - west_pair[1]
         west_g_cost = Math.sqrt(west_node_x * west_node_x + west_node_y * west_node_y)
+
+
+        north_west_x = @put_at[:a][:x] - north_west[0]
+        north_west_y = @put_at[:a][:y] - north_west[1]
+        north_west_g_cost = Math.sqrt(north_west_x * north_west_x + north_west_y * north_west_y)
+
+        north_east_x = @put_at[:a][:x] - north_east[0]
+        north_east_y = @put_at[:a][:y] - north_east[1]
+        north_east_g_cost = Math.sqrt(north_east_x * north_east_x + north_east_y * north_east_y)
+
+        south_west_x = @put_at[:a][:x] - south_west[0]
+        south_west_y = @put_at[:a][:y] - south_west[1]
+        south_west_g_cost = Math.sqrt(south_west_x * south_west_x + south_west_y * south_west_y)
+
+        south_east_x = @put_at[:a][:x] - south_east[0]
+        south_east_y = @put_at[:a][:y] - south_east[1]
+        south_east_g_cost = Math.sqrt(south_east_x * south_east_x + south_east_y * south_east_y)
 
         # surrounding node calculations h cost (distance from end node)
 
@@ -117,6 +142,24 @@ class Simulator
         west_node_y = @put_at[:b][:y] - west_pair[1]
         west_h_cost = Math.sqrt(west_node_x * west_node_x + west_node_y * west_node_y)
 
+
+
+        north_west_x = @put_at[:b][:x] - north_west[0]
+        north_west_y = @put_at[:b][:y] - north_west[1]
+        north_west_h_cost = Math.sqrt(north_west_x * north_west_x + north_west_y * north_west_y)
+
+        north_east_x = @put_at[:b][:x] - north_east[0]
+        north_east_y = @put_at[:b][:y] - north_east[1]
+        north_east_h_cost = Math.sqrt(north_east_x * north_east_x + north_east_y * north_east_y)
+
+        south_west_x = @put_at[:b][:x] - south_west[0]
+        south_west_y = @put_at[:b][:y] - south_west[1]
+        south_west_h_cost = Math.sqrt(south_west_x * south_west_x + south_west_y * south_west_y)
+
+        south_east_x = @put_at[:b][:x] - south_east[0]
+        south_east_y = @put_at[:b][:y] - south_east[1]
+        south_east_h_cost = Math.sqrt(south_east_x * south_east_x + south_east_y * south_east_y)
+
         # surrounding node calculations f cost - lowest preferred (g cost + h cost)
 
         north_f_cost = north_g_cost + north_h_cost
@@ -124,9 +167,14 @@ class Simulator
         east_f_cost = east_g_cost + east_h_cost
         west_f_cost = west_g_cost + west_h_cost
 
-        @stats[:gcost] = { :north => north_g_cost, :south => south_g_cost, :east => east_g_cost, :west => west_g_cost }
-        @stats[:hcost] = { :north => north_h_cost, :south => south_h_cost, :east => east_h_cost, :west => west_h_cost }
-        @stats[:fcost] = { :north => north_f_cost.round(0), :south => south_f_cost.round(0), :east => east_f_cost.round(0), :west => west_f_cost.round(0) }
+        north_west_f_cost = north_west_g_cost + north_west_h_cost
+        north_east_f_cost = north_east_g_cost + north_east_h_cost
+        south_west_f_cost = south_west_g_cost + south_west_h_cost
+        south_east_f_cost = south_east_g_cost + south_east_h_cost
+
+        @stats[:gcost] = { :north => north_g_cost, :south => south_g_cost, :east => east_g_cost, :west => west_g_cost, :north_west => north_west_g_cost, :north_east => north_east_g_cost, :south_west => south_west_g_cost, :south_east => south_east_g_cost }
+        @stats[:hcost] = { :north => north_h_cost, :south => south_h_cost, :east => east_h_cost, :west => west_h_cost, :north_west => north_west_h_cost, :north_east => north_east_h_cost, :south_west => south_west_h_cost, :south_east => south_east_h_cost }
+        @stats[:fcost] = { :north => north_f_cost, :south => south_f_cost, :east => east_f_cost, :west => west_f_cost, :north_west => north_west_f_cost, :north_east => north_east_f_cost, :south_west => south_west_f_cost, :south_east => south_east_f_cost }
 
         # calculate moves
 
@@ -148,10 +196,25 @@ class Simulator
                 @stats[:hcost].delete(:west)
                 @stats[:fcost].delete(:west)
             end
+            if(north_west[1] == @put_at[:wall][:y] && @put_at[:wall][:x].any?(north_west[0]) || @traversed.has_key?(@nw_pos))
+                @stats[:hcost].delete(:north_west)
+                @stats[:fcost].delete(:north_west)
+            end
+            if(north_east[1] == @put_at[:wall][:y] && @put_at[:wall][:x].any?(north_east[0]) || @traversed.has_key?(@ne_pos))
+                @stats[:hcost].delete(:north_east)
+                @stats[:fcost].delete(:north_east)
+            end
+            if(south_west[1] == @put_at[:wall][:y] && @put_at[:wall][:x].any?(south_west[0]) || @traversed.has_key?(@sw_pos))
+                @stats[:hcost].delete(:south_west)
+                @stats[:fcost].delete(:south_west)
+            end
+            if(south_east[1] == @put_at[:wall][:y] && @put_at[:wall][:x].any?(south_east[0]) || @traversed.has_key?(@se_pos))
+                @stats[:hcost].delete(:south_east)
+                @stats[:fcost].delete(:south_east)
+            end
 
             calculate_move(@stats[:gcost], @stats[:hcost], @stats[:fcost])
         else
-            @traversed.clear()
             while(@conflicting_values)
                 x = rand(border_thickness + 1..width - @border_thickness)
                 y = rand(border_thickness + 1..height - border_thickness)
@@ -161,7 +224,8 @@ class Simulator
                     @put_at[:b][:y] = y
                 end
             end
-
+            @traversed.clear()
+        
             @conflicting_values = true
         end
     end
@@ -205,7 +269,6 @@ class Simulator
     
         # @last_node_sym = @current_node_key
         #@current_node_key = get_current_node_key()
-
         case(direction)
         when :north
             @put_at[:a][:y] -= 1
@@ -215,6 +278,18 @@ class Simulator
             @put_at[:a][:x] += 1
         when :west
             @put_at[:a][:x] -= 1
+        when :north_west
+            @put_at[:a][:x] -= 1
+            @put_at[:a][:y] -= 1
+        when :north_east
+            @put_at[:a][:x] += 1
+            @put_at[:a][:y] -= 1
+        when :south_west
+            @put_at[:a][:x] -= 1
+            @put_at[:a][:y] += 1
+        when :south_east
+            @put_at[:a][:x] += 1
+            @put_at[:a][:y] += 1
         else
             print("help, something is wrong!\ndirection was: #{direction}\ntraversed: #{@traversed}\n".colorize(:red))
             sleep(2)

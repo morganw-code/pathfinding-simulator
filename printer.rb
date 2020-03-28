@@ -98,10 +98,10 @@ class Printer
 
     def print_stats()
         rows = []
-        rows << ["G COST", @SIMULATOR_INSTANCE.stats[:gcost][:north], @SIMULATOR_INSTANCE.stats[:gcost][:south], @SIMULATOR_INSTANCE.stats[:gcost][:east], @SIMULATOR_INSTANCE.stats[:gcost][:west]]
-        rows << ["H COST", @SIMULATOR_INSTANCE.stats[:hcost][:north], @SIMULATOR_INSTANCE.stats[:hcost][:south], @SIMULATOR_INSTANCE.stats[:hcost][:east], @SIMULATOR_INSTANCE.stats[:hcost][:west]]
-        rows << ["F COST", @SIMULATOR_INSTANCE.stats[:fcost][:north], @SIMULATOR_INSTANCE.stats[:fcost][:south], @SIMULATOR_INSTANCE.stats[:fcost][:east], @SIMULATOR_INSTANCE.stats[:fcost][:west]]
-        table = Terminal::Table.new(:headings => ['COST', 'NORTH', 'SOUTH', 'EAST', 'WEST'], :rows => rows, :all_separators => true) 
+        rows << ["G COST", @SIMULATOR_INSTANCE.stats[:gcost][:north], @SIMULATOR_INSTANCE.stats[:gcost][:south], @SIMULATOR_INSTANCE.stats[:gcost][:east], @SIMULATOR_INSTANCE.stats[:gcost][:west], @SIMULATOR_INSTANCE.stats[:gcost][:north_west], @SIMULATOR_INSTANCE.stats[:gcost][:north_east], @SIMULATOR_INSTANCE.stats[:gcost][:south_west], @SIMULATOR_INSTANCE.stats[:gcost][:south_east]]
+        rows << ["H COST", @SIMULATOR_INSTANCE.stats[:hcost][:north], @SIMULATOR_INSTANCE.stats[:hcost][:south], @SIMULATOR_INSTANCE.stats[:hcost][:east], @SIMULATOR_INSTANCE.stats[:hcost][:west], @SIMULATOR_INSTANCE.stats[:hcost][:north_west], @SIMULATOR_INSTANCE.stats[:hcost][:north_east], @SIMULATOR_INSTANCE.stats[:hcost][:south_west], @SIMULATOR_INSTANCE.stats[:hcost][:south_east]]
+        rows << ["F COST", @SIMULATOR_INSTANCE.stats[:fcost][:north], @SIMULATOR_INSTANCE.stats[:fcost][:south], @SIMULATOR_INSTANCE.stats[:fcost][:east], @SIMULATOR_INSTANCE.stats[:fcost][:west], @SIMULATOR_INSTANCE.stats[:fcost][:north_west], @SIMULATOR_INSTANCE.stats[:fcost][:north_east], @SIMULATOR_INSTANCE.stats[:fcost][:south_west], @SIMULATOR_INSTANCE.stats[:fcost][:south_east]]
+        table = Terminal::Table.new(:headings => ['COST', 'NORTH', 'SOUTH', 'EAST', 'WEST', 'NORTH_WEST', 'NORTH_EAST', 'SOUTH_WEST', 'SOUTH_EAST'], :rows => rows, :all_separators => true) 
         print "#{table}\n"
     end
 
