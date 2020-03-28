@@ -19,8 +19,10 @@ redundant
 | Gem        | Use                                                                                                              |
 |------------|------------------------------------------------------------------------------------------------------------------|
 | `colorize` | colorize is used for coloring output on the screen. |
-|------------|------------------------------------------------------------------------------------------------------------------|
 | `terminal-table` | terminal-table is used for structuring statistical data. |
 
 ### Execution
 `ruby simulation.rb`
+
+### Note
+A* pathfinding algorithm is not properly implemented yet!
