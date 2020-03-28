@@ -143,7 +143,6 @@ class Simulator
         west_h_cost = Math.sqrt(west_node_x * west_node_x + west_node_y * west_node_y)
 
 
-
         north_west_x = @put_at[:b][:x] - north_west[0]
         north_west_y = @put_at[:b][:y] - north_west[1]
         north_west_h_cost = Math.sqrt(north_west_x * north_west_x + north_west_y * north_west_y)
@@ -172,27 +171,27 @@ class Simulator
         south_west_f_cost = south_west_g_cost + south_west_h_cost
         south_east_f_cost = south_east_g_cost + south_east_h_cost
 
-        @stats[:gcost] = { :north => north_g_cost, :south => south_g_cost, :east => east_g_cost, :west => west_g_cost, :north_west => north_west_g_cost, :north_east => north_east_g_cost, :south_west => south_west_g_cost, :south_east => south_east_g_cost }
-        @stats[:hcost] = { :north => north_h_cost, :south => south_h_cost, :east => east_h_cost, :west => west_h_cost, :north_west => north_west_h_cost, :north_east => north_east_h_cost, :south_west => south_west_h_cost, :south_east => south_east_h_cost }
-        @stats[:fcost] = { :north => north_f_cost, :south => south_f_cost, :east => east_f_cost, :west => west_f_cost, :north_west => north_west_f_cost, :north_east => north_east_f_cost, :south_west => south_west_f_cost, :south_east => south_east_f_cost }
+        @stats[:gcost] = { :north => north_g_cost.round(0), :south => south_g_cost.round(0), :east => east_g_cost.round(0), :west => west_g_cost.round(0), :north_west => north_west_g_cost.round(0), :north_east => north_east_g_cost.round(0), :south_west => south_west_g_cost.round(0), :south_east => south_east_g_cost.round(0) }
+        @stats[:hcost] = { :north => north_h_cost.round(0), :south => south_h_cost.round(0), :east => east_h_cost.round(0), :west => west_h_cost.round(0), :north_west => north_west_h_cost.round(0), :north_east => north_east_h_cost.round(0), :south_west => south_west_h_cost.round(0), :south_east => south_east_h_cost.round(0) }
+        @stats[:fcost] = { :north => north_f_cost.round(0), :south => south_f_cost.round(0), :east => east_f_cost.round(0), :west => west_f_cost.round(0), :north_west => north_west_f_cost.round(0), :north_east => north_east_f_cost.round(0), :south_west => south_west_f_cost.round(0), :south_east => south_east_f_cost.round(0) }
 
         # calculate moves
 
         # if A pos != B pos
         if(!(@put_at[:a][:x] == @put_at[:b][:x] && @put_at[:a][:y] == @put_at[:b][:y]))
-            if(north_y == @put_at[:wall][:y] && @put_at[:wall][:x].any?(north_x) && !is_open(north_x, north_y) || @traversed.has_key?(@n_pos))
+            if(north_y == @put_at[:wall][:y] && @put_at[:wall][:x].any?(north_x) || @traversed.has_key?(@n_pos))
                 @stats[:hcost].delete(:north)
                 @stats[:fcost].delete(:north)
             end
-            if(south_y == @put_at[:wall][:y] && @put_at[:wall][:x].any?(south_x) && !is_open(south_x, south_y) || @traversed.has_key?(@s_pos))
+            if(south_y == @put_at[:wall][:y] && @put_at[:wall][:x].any?(south_x) || @traversed.has_key?(@s_pos))
                 @stats[:hcost].delete(:south)
                 @stats[:fcost].delete(:south)
             end
-            if(@put_at[:wall][:x].any?(east_x) && east_y == @put_at[:wall][:y] && !is_open(east_x, east_y) || @traversed.has_key?(@e_pos))
+            if(@put_at[:wall][:x].any?(east_x) && east_y == @put_at[:wall][:y] || @traversed.has_key?(@e_pos))
                 @stats[:hcost].delete(:east)
                 @stats[:fcost].delete(:east)
             end
-            if(@put_at[:wall][:x].any?(west_x) && west_y == @put_at[:wall][:y] && !is_open(west_x, west_y) || @traversed.has_key?(@w_pos))
+            if(@put_at[:wall][:x].any?(west_x) && west_y == @put_at[:wall][:y] || @traversed.has_key?(@w_pos))
                 @stats[:hcost].delete(:west)
                 @stats[:fcost].delete(:west)
             end
@@ -320,5 +319,6 @@ class Simulator
     end
 end
 
-sim = Simulator.new(20, 10, 1)
+# don't set border thickness for now, it is not properly calculated for
+sim = Simulator.new(50, 25, 0)
 sim.run()

@@ -48,20 +48,18 @@ class Printer
                     if(@boot)
                         generate_node("n#{@node_count}".to_sym(), :b, x + @SCREEN_BORDER_THICKNESS, y, true)
                     end
-                # ghost
-                # elsif(x + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.traversed.any?(x) && y + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.traversed.any?(y))
-                    # if(!@boot)
-                        # @printer_active_buffer.push("X".colorize(:yellow))
-                    # end
-                elsif(x + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:wall][:x][$i] && y + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:wall][:y])
+                elsif(x + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:wall][:x][i] && y + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:wall][:y])
                     @printer_active_buffer.push("N".colorize(:red))
                     if(@boot)
                         generate_node("n#{@node_count}".to_sym(), :wall, x + @SCREEN_BORDER_THICKNESS, y + @SCREEN_BORDER_THICKNESS, false)
                     end
                     $i += 1
+                     # ghost
+                elsif(@SIMULATOR_INSTANCE.traversed.has_key?("n#{@node_count}".to_sym()))
+                        @printer_active_buffer.push("X".colorize(:yellow))
                 # else x is empty space
                 else
-                    @printer_active_buffer.push("0")
+                    @printer_active_buffer.push("0".colorize(:black))
                     if(@boot)
                         generate_node("n#{@node_count}".to_sym(), :empty, x, y, true)
                     end
