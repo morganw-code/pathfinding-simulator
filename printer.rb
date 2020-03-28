@@ -1,68 +1,73 @@
 require 'colorize'
-#testing
-
-$open_list = {}
+require 'terminal-table'
 
 class Printer
-    attr_accessor :printer_cache_buffer, :printer_active_buffer, :boot , :SCREEN_WIDTH, :SCREEN_HEIGHT, :SCREEN_BORDER_THICKNESS, :SIMULATOR_INSTANCE
+    attr_accessor :printer_cache_buffer, :printer_active_buffer, :boot, :node_count, :SCREEN_WIDTH, :SCREEN_HEIGHT, :SCREEN_BORDER_THICKNESS, :SIMULATOR_INSTANCE
 
     def initialize(width, height, border_thickness, simulator_instance)
         @printer_cache_buffer = []
         @printer_active_buffer = []
         @boot = true
-        put_at = {}
+        @node_count = 0
         @SCREEN_WIDTH  = width
         @SCREEN_HEIGHT = height
         @SCREEN_BORDER_THICKNESS = border_thickness
         @SIMULATOR_INSTANCE = simulator_instance
     end
 
-    def do_frame()
+    def frame()
         x = 0
         y = 0
-
+        i = 0
         while(y < @SCREEN_HEIGHT)
             x = 0
             # check if inside border
             while(x < @SCREEN_WIDTH && @printer_active_buffer.count() < @SCREEN_WIDTH)
+                @node_count += 1
                 # if x is supposed to be a border left and right side
                 if((x == 0 || x == @SCREEN_WIDTH - @SCREEN_BORDER_THICKNESS) && @SCREEN_BORDER_THICKNESS > 0)
                     @printer_active_buffer.push("N".colorize(:red))
                     if(@boot)
-                        generate_node("n#{$node_count}".to_sym(), :border, x, y, false)
+                        generate_node("n#{@node_count}".to_sym(), :border, x, y, false)
                     end
                 # if y is supposed to be a border top and bottom side
                 elsif((y == 0 || y == @SCREEN_HEIGHT - @SCREEN_BORDER_THICKNESS) && @SCREEN_BORDER_THICKNESS > 0)
                     @printer_active_buffer.push("N".colorize(:red))
                     if(@boot)
-                        generate_node("n#{$node_count}".to_sym(), :border, x, y, false)
+                        generate_node("n#{@node_count}".to_sym(), :border, x, y, false)
                     end
                 # if x is item and in correct y position
                 elsif(x + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:a][:x] && y + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:a][:y])
                     @printer_active_buffer.push("X".colorize(:blue))
                     if(@boot)
-                        generate_node("n#{$node_count}".to_sym(), :a, x, y, true)
+                        generate_node("n#{@node_count}".to_sym(), :a, x, y, true)
                     end
                 # if x is item and in correct y position
                 elsif(x + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:b][:x] && y + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:b][:y])
                     @printer_active_buffer.push("X".colorize(:green))
                     if(@boot)
-                        generate_node("n#{$node_count}".to_sym(), :b, x + @SCREEN_BORDER_THICKNESS, y, true)
+                        generate_node("n#{@node_count}".to_sym(), :b, x + @SCREEN_BORDER_THICKNESS, y, true)
                     end
+                # ghost
+                # elsif(x + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.traversed.any?(x) && y + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.traversed.any?(y))
+                    # if(!@boot)
+                        # @printer_active_buffer.push("X".colorize(:yellow))
+                    # end
                 elsif(x + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:wall][:x][$i] && y + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:wall][:y])
                     @printer_active_buffer.push("N".colorize(:red))
                     if(@boot)
-                        generate_node("n#{$node_count}".to_sym(), :wall, x + @SCREEN_BORDER_THICKNESS, y + @SCREEN_BORDER_THICKNESS, false)
+                        generate_node("n#{@node_count}".to_sym(), :wall, x + @SCREEN_BORDER_THICKNESS, y + @SCREEN_BORDER_THICKNESS, false)
                     end
                     $i += 1
                 # else x is empty space
                 else
                     @printer_active_buffer.push("0")
                     if(@boot)
-                        generate_node("n#{$node_count}".to_sym(), :empty, x, y, true)
+                        generate_node("n#{@node_count}".to_sym(), :empty, x, y, true)
                     end
                 end
                 x += 1
+                i += 1
             end
             $i = 0
             y += 1
@@ -71,8 +76,18 @@ class Printer
         end
         @boot = false
 
-        # stats
-        # print_stats()
+
+        @SIMULATOR_INSTANCE.current_position[:x] = @SIMULATOR_INSTANCE.put_at[:a][:x]
+        @SIMULATOR_INSTANCE.current_position[:y] = @SIMULATOR_INSTANCE.put_at[:a][:y]
+
+        @SIMULATOR_INSTANCE.set_current_node_key()
+    end
+
+    def do_frame()
+        system('clear') || system('cls')
+        @node_count = 0
+
+        frame()
     end
 
     def print_line()
@@ -82,12 +97,17 @@ class Printer
     end
 
     def print_stats()
-
+        rows = []
+        rows << ["G COST", @SIMULATOR_INSTANCE.stats[:gcost][:north], @SIMULATOR_INSTANCE.stats[:gcost][:south], @SIMULATOR_INSTANCE.stats[:gcost][:east], @SIMULATOR_INSTANCE.stats[:gcost][:west]]
+        rows << ["H COST", @SIMULATOR_INSTANCE.stats[:hcost][:north], @SIMULATOR_INSTANCE.stats[:hcost][:south], @SIMULATOR_INSTANCE.stats[:hcost][:east], @SIMULATOR_INSTANCE.stats[:hcost][:west]]
+        rows << ["F COST", @SIMULATOR_INSTANCE.stats[:fcost][:north], @SIMULATOR_INSTANCE.stats[:fcost][:south], @SIMULATOR_INSTANCE.stats[:fcost][:east], @SIMULATOR_INSTANCE.stats[:fcost][:west]]
+        table = Terminal::Table.new(:headings => ['COST', 'NORTH', 'SOUTH', 'EAST', 'WEST'], :rows => rows, :all_separators => true) 
+        print "#{table}\n"
     end
 
     # this should reside in sim
     def generate_node(id_sym, type_sym, x, y, is_open)
-        $open_list[id_sym] = { :type => type_sym, :x => x, :y => y, :is_open => is_open }
+        @SIMULATOR_INSTANCE.node_list[id_sym] = { :type => type_sym, :x => x, :y => y, :is_open => is_open }
     end
 end
 
