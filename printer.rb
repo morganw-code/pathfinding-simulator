@@ -1,22 +1,23 @@
 require 'colorize'
-$put_at = { :a => {:x => 2, :y => 2},
-            :b => { :x => 19, :y => 9 },
-            :wall => { :x => [2, 3, 4, 5, 6, 7, 8, 9, 10], :y => 5 } }
+#testing
+
 $open_list = {}
 
 class Printer
-    attr_accessor :printer_cache_buffer, :printer_active_buffer, :boot, :SCREEN_WIDTH, :SCREEN_HEIGHT, :SCREEN_BORDER_THICKNESS
+    attr_accessor :printer_cache_buffer, :printer_active_buffer, :boot , :SCREEN_WIDTH, :SCREEN_HEIGHT, :SCREEN_BORDER_THICKNESS, :SIMULATOR_INSTANCE
 
-    def initialize(width, height, border_thickness)
+    def initialize(width, height, border_thickness, simulator_instance)
         @printer_cache_buffer = []
         @printer_active_buffer = []
         @boot = true
+        put_at = {}
         @SCREEN_WIDTH  = width
         @SCREEN_HEIGHT = height
         @SCREEN_BORDER_THICKNESS = border_thickness
+        @SIMULATOR_INSTANCE = simulator_instance
     end
 
-    def start()
+    def do_frame()
         x = 0
         y = 0
 
@@ -37,18 +38,18 @@ class Printer
                         generate_node("n#{$node_count}".to_sym(), :border, x, y, false)
                     end
                 # if x is item and in correct y position
-                elsif(x + @SCREEN_BORDER_THICKNESS == $put_at[:a][:x] && y + @SCREEN_BORDER_THICKNESS == $put_at[:a][:y])
+                elsif(x + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:a][:x] && y + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:a][:y])
                     @printer_active_buffer.push("X".colorize(:blue))
                     if(@boot)
                         generate_node("n#{$node_count}".to_sym(), :a, x, y, true)
                     end
                 # if x is item and in correct y position
-                elsif(x + @SCREEN_BORDER_THICKNESS == $put_at[:b][:x] && y + @SCREEN_BORDER_THICKNESS == $put_at[:b][:y])
+                elsif(x + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:b][:x] && y + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:b][:y])
                     @printer_active_buffer.push("X".colorize(:green))
                     if(@boot)
                         generate_node("n#{$node_count}".to_sym(), :b, x + @SCREEN_BORDER_THICKNESS, y, true)
                     end
-                elsif(x + @SCREEN_BORDER_THICKNESS == $put_at[:wall][:x][$i] && y + @SCREEN_BORDER_THICKNESS == $put_at[:wall][:y])
+                elsif(x + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:wall][:x][$i] && y + @SCREEN_BORDER_THICKNESS == @SIMULATOR_INSTANCE.put_at[:wall][:y])
                     @printer_active_buffer.push("N".colorize(:red))
                     if(@boot)
                         generate_node("n#{$node_count}".to_sym(), :wall, x + @SCREEN_BORDER_THICKNESS, y + @SCREEN_BORDER_THICKNESS, false)
@@ -63,17 +64,25 @@ class Printer
                 end
                 x += 1
             end
-
-            print_line()
             $i = 0
             y += 1
+
+            print_line()
         end
+        @boot = false
+
+        # stats
+        # print_stats()
     end
 
     def print_line()
         print("#{@printer_active_buffer.join()}\n")
         @printer_cache_buffer.push(@printer_active_buffer)
         @printer_active_buffer.clear()
+    end
+
+    def print_stats()
+
     end
 
     # this should reside in sim
@@ -83,5 +92,5 @@ class Printer
 end
 
 # testing
-printer = Printer.new(20, 10, 1)
-printer.start()
+#printer = Printer.new(20, 10, 1)
+#printer.start()
