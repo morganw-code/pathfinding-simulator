@@ -23,7 +23,6 @@ class Printer
             x = 0
             # check if inside border
             while(x < @SCREEN_WIDTH && @printer_active_buffer.count() < @SCREEN_WIDTH)
-                @node_count += 1
                 # if x is supposed to be a border left and right side
                 if((x == 0 || x == @SCREEN_WIDTH - @SCREEN_BORDER_THICKNESS) && @SCREEN_BORDER_THICKNESS > 0)
                     @printer_active_buffer.push("N".colorize(:red))
@@ -66,6 +65,7 @@ class Printer
                 end
                 x += 1
                 i += 1
+                @node_count += 1
             end
             $i = 0
             y += 1
@@ -90,7 +90,7 @@ class Printer
 
     def print_line()
         print("#{@printer_active_buffer.join()}\n")
-        @printer_cache_buffer.push(@printer_active_buffer)
+        # @printer_cache_buffer.push(@printer_active_buffer)
         @printer_active_buffer.clear()
     end
 
